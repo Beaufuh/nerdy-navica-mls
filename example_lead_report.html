@@ -1,0 +1,5038 @@
+<!DOCTYPE html>
+<!-- saved from url=(0085)https://next.navicamls.net/413/ListingDisplay/?eListingId=16652761&eListingKey=6cnrMN -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Emailed Listings</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    
+
+    <link href="./example_lead_report_files/dialogBoxes.css" rel="stylesheet" type="text/css">
+    <link href="./example_lead_report_files/toolbars.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./example_lead_report_files/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <link href="./example_lead_report_files/datatables.css" rel="stylesheet" type="text/css">
+
+    <!--[if IE]>
+        <link href="/Content/IE9Shim.css" rel="stylesheet" type="text/css" />
+    <![endif]-->
+
+     
+    
+    <script src="./example_lead_report_files/jquery-2.2.4.min.js.download" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+    <script src="./example_lead_report_files/jquery-ui.min.js.download" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+
+    <script src="./example_lead_report_files/bootstrap.min.js.download" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    
+    <script src="./example_lead_report_files/bootstrap.bundle.min.js.download" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+    <script src="./example_lead_report_files/bootstrap.js.download"></script>
+    <script src="./example_lead_report_files/RGraph.common.core.js.download"></script>
+    <script src="./example_lead_report_files/RGraph.bar.js.download"></script>
+    <script src="./example_lead_report_files/jQueryPrint.js.download"></script>
+    <script src="./example_lead_report_files/loadingAnimation.js.download" type="text/javascript"></script>
+    <script src="./example_lead_report_files/jQueryHighlightPlugin.js.download"></script>
+
+    
+    <script src="./example_lead_report_files/datatables.js.download"></script>
+    <script src="./example_lead_report_files/fixedheader.js.download"></script>
+
+    <!--[if lt IE 9]><script src="/Plugins/RGraph/excanvas/excanvas.js?v1.5.39"></script><![endif]-->
+
+    <script src="./example_lead_report_files/jquery.jgrowl.js.download"></script>
+
+    <link href="./example_lead_report_files/toolbars.css" rel="stylesheet" type="text/css">
+    <link href="./example_lead_report_files/expandedGlobalStylesEmail.css" rel="stylesheet" type="text/css">
+
+    <script src="./example_lead_report_files/Expanded.js.download"></script>
+    <script src="./example_lead_report_files/Map.js.download"></script>
+    <script src="./example_lead_report_files/Email.js.download"></script>
+    <script src="./example_lead_report_files/ListingToolsExpanded.js.download"></script>
+    <link media="print" href="./example_lead_report_files/printEmailExpanded.css" rel="stylesheet" type="text/css">
+    </head>
+
+
+<body>
+
+    <input id="SelectedMlsNos" name="SelectedMlsNos" type="hidden" value="481786,481841,481991,475693,478216,480766,481627,481850,481941">
+    <input id="AllFormatNos" name="AllFormatNos" type="hidden" value="1">
+    <input id="AllMlsNos" name="AllMlsNos" type="hidden" value="481786,481841,481991,475693,478216,480766,481627,481850,481941">
+
+
+    <script>
+
+        var mapDia;
+        var mapDivId = "";
+        var mySelectedListings = new Array();
+        var boxes = new Array();
+        var ii = null;
+        var t;
+        var hovered = false;
+
+        //Variables requiring MVC population for functions now in .JS files
+        var tmpQueryId = Number('0');
+        var tmpQueryIdChangeListing = '0';
+        var formatNo = Number('0');
+        var pageIndex = '1';
+        var pageSize = 1;
+        var isSinglePage = false;
+            // Trac 13068
+
+        var formatNos = '0';
+        var isGridLayout = 'false';
+
+        var maxMlsNosInUrl = Number('200');
+        var mapCredentials = 'AvTCoPHPBocm4Gx-JBKCQXdTps1TvY_KmI_ObcmQU1w50Tiw-auJSN7OhxGz47mG';
+        var pushpinPriceBubbleUrl = '/Content/images/priceBubble.png';
+        var listingMapInfoByMlsNo = '/413/Listing/GetListingMapInfoByMlsNo';
+        var printFullMap = '/413/Listing/PrintMapFullPage';
+        //Trac15500
+
+        //This is a hack so IE won't print 2 blank pages before each expanded display.
+        function detectIE() {
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf('MSIE ');
+            var trident = ua.indexOf('Trident/');
+
+            if (msie > 0) {
+                // IE 10 or older => return version number
+                return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+            }
+
+            if (trident > 0) {
+                // IE 11 (or newer) => return version number
+                var rv = ua.indexOf('rv:');
+                return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+            }
+
+            // other browser
+            return false;
+        }
+
+        //Paging management
+        var allMlsNos = [];
+        var currentMlsNo = '0';
+        var currentMlsNoIndex;
+        var nextMlsNo;
+        var prevMlsNo;
+
+        function populateAllMlsNos() {
+            var mlsNosComma = $('#AllMlsNos').val();
+            allMlsNos = mlsNosComma.split(',');
+
+            populateCurrentMlsNo(currentMlsNo); //Little weird but it gets the index set
+        }
+
+        function populateCurrentMlsNo(mlsNo) {
+            currentMlsNo = mlsNo;
+            currentMlsNoIndex = allMlsNos.indexOf(currentMlsNo) + 1;
+            pageIndex = currentMlsNoIndex;
+            $('#pageIndex').val(currentMlsNoIndex);
+        }
+
+        function populatePrevMlsNo() {
+            if (currentMlsNoIndex == 1) {
+                prevMlsNo = 0;
+                $('.prevButton').hide();
+            }
+            else {
+                prevMlsNo = allMlsNos[currentMlsNoIndex - 2]; //Remember index = 1 based so have to go back 2 to get to previous in array
+                $('.prevButton').show();
+            }
+        }
+
+        function populateNextMlsNo() {
+            if (currentMlsNoIndex == allMlsNos.length) {
+                nextMlsNo = 0;
+                $('.nextButton').hide();
+            }
+            else {
+                nextMlsNo = allMlsNos[currentMlsNoIndex]; //Remember index = 1 based so have to do nothing (already + 1) to get next in array
+                $('.nextButton').show();
+            }
+        }
+
+        //function jsDisplaySequence() {
+        //    $("#JsDisplaySequence").html('<span> Viewing ' + currentMlsNoIndex + ' of ' + '' + '</span>');
+        //}
+
+        $(document).ready(function () {
+            populateAllMlsNos();
+
+            //if (isSinglePage) {
+            //    populatePrevMlsNo();
+            //    populateNextMlsNo();
+            //    jsDisplaySequence();
+
+            //    $(document).on("click", ".prevButton", function () {
+            //        var formatNo = getSelectedFormatNo(prevMlsNo, allMlsNos, formatNos);
+            //        getNextPrevListing(prevMlsNo, formatNo);
+
+            //        populateCurrentMlsNo(prevMlsNo);
+            //        jsDisplaySequence();
+            //        populatePrevMlsNo();
+            //        populateNextMlsNo();
+
+            //        $(window).scrollTop(0);
+            //    });
+
+            //    $(document).on("click", ".nextButton", function () {
+            //        var formatNo = getSelectedFormatNo(nextMlsNo, allMlsNos, formatNos);
+            //        getNextPrevListing(nextMlsNo, formatNo);
+
+            //        populateCurrentMlsNo(nextMlsNo);
+            //        jsDisplaySequence();
+            //        populatePrevMlsNo();
+            //        populateNextMlsNo();
+
+            //        $(window).scrollTop(0);
+            //    });
+            //}
+            //else {
+            //    $('.nextButton').hide();
+            //    $('.prevButton').hide();
+            //}
+
+            //var showingsOnPage = $('.listingToolbarWithIcons').length;
+            //if (showingsOnPage > 1) {
+            //    $('.prevButton, .nextButton').css('display', 'none');
+            //}
+
+            //IE Hack from above
+            //if (detectIE(true)) {
+            //    $('.expandedListingWrapper').each(function (index, wrapper) {
+            //        $('.expandedListingWrapper').addClass('expandedWrapperIE');
+            //        $('#displayWrapper').addClass('expandedOverallWrapperIE');
+            //    });
+            //    //console.log('True');
+            //} else {
+            //    $('.expandedListingWrapper').each(function (index, wrapper) {
+            //        $('.expandedListingWrapper').addClass('expandedWrapperNotIE');
+            //        $('#displayWrapper').addClass('expandedOverallWrapperNotIE');
+            //    });
+            //    //console.log('False');
+            //}
+
+        });
+    </script>
+
+    
+<form action="https://next.navicamls.net/413/Photo/PhotoMaintenance" id="photoMaintForm" method="post"><input id="queryId" name="queryId" type="hidden" value="0"><input id="this_format" name="this_format" type="hidden" value="1">        <input id="mlsNoPhoto" name="mlsNoPhoto" type="hidden" value="">
+<input id="is_pop_win" name="is_pop_win" type="hidden" value="True"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="searchId" name="searchId" type="hidden" value="0"><input id="savedQueryId" name="savedQueryId" type="hidden" value="0"><input id="isFilteredListings" name="isFilteredListings" type="hidden" value="false"><input id="isNewProspect" name="isNewProspect" type="hidden" value="false"><input id="contactId" name="contactId" type="hidden" value="0"><input id="savedSearchListingId" name="savedSearchListingId" type="hidden" value="0"><input id="hotSheetSections" name="hotSheetSections" type="hidden" value=""><input id="isHotsheet" name="isHotsheet" type="hidden" value="False"><input id="statsReturnToPageIndex" name="statsReturnToPageIndex" type="hidden" value="1">        <input name="mapSearchQueryId" type="hidden" value="0">
+        <input type="hidden" name="mlsNo" id="mlsNoPhotoMaint">
+        <input id="allFormatNos" name="allFormatNos" type="hidden" value="1">
+        <input id="selectedMlsNos" name="selectedMlsNos" type="hidden" value="481786,481841,481991,475693,478216,480766,481627,481850,481941">
+        <input id="allMlsNos" name="allMlsNos" type="hidden" value="481786,481841,481991,475693,478216,480766,481627,481850,481941">
+        <input id="isOnlyOneMlsPerPage" name="isOnlyOneMlsPerPage" type="hidden">
+        <input name="sourceActionForBackButton" id="sourceActionForBackButton" type="hidden" value="">
+        <input id="originalSourceAction" name="originalSourceAction" type="hidden" value="">
+</form>    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+
+    <nav class="navbar fixed-top navbar-light bg-light">
+        <div class="mr-sm-2">
+            <a href="javascript:window.print()" class="btn btn-sm btn-outline-secondary my-2 my-sm-0">
+                <img alt="Print Icon" src="./example_lead_report_files/printer.png">Print
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="sr-only noprint">
+            <div class="row">
+                <div class="col-12">
+                    <h1>Emailed Listings</h1>
+                </div>
+            </div>
+        </div>
+        <div id="expandedDisplayWrapper" class="">
+            
+
+
+            <div id="displayWrapper" class="">
+                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="481786">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 481786" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="481786">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R481786A
+                                (Active)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $299,900
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>451 Baker Woods Trail Martinez, GA 30907</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_481786" data-mlsno="481786" data-imagesource="https://images.navicamls.net/413/photos/6/481786_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/6/481786_0$.jpg" data-taxid="" data-latitude="33.5322262" data-longitude="-82.0794028" data-price="299900" data-format="1" data-address="451  Baker Woods Trail   Martinez , GA  30907" data-dom="" data-officeid="624" data-agentid="108" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="2" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="0" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Columbia (2CO)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">COLUMBIA</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">BAKER WOODS</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">Stevens Creek</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Lakeside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Lakeside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">11</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">4</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1">Yes</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">2300</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1988</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R481786A" title="R481786A" data-image-url="https://images.navicamls.net/413/photos/6/481786_0.jpg" src="./example_lead_report_files/481786_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Built Ins, Cable Ready, Cable Available, Drywall, Eat In Kitchen, Foyer, Garden Window, Pantry, Smoke Detector, Recently Painted, Walk-in Closet, Washer/Dryer Connection, Blinds, Split Bedroom</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Dishwasher, Disposal, Double Oven, Microwave, Rangetop, Vent Hood, Hot Water-Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">Foyer, Owner Bath, Sunroom Heated, Laundry Room</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Great Room</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Forced Air, Heat Pump, Single System</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Electric, Natural Gas, Wood</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Ceiling Fan(s), Zoned, Central, Heat Pump, Single System</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Updated, Fence-Privacy, Fenced Yard, Garden Area, Landscaped-Full, Lawn Sprinkler, Secluded Lot</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Garage Double Attached, Storage, Auto Door Opener</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">Cul-de-Sac</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Street Lights</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">16</td>
+                    <td class="">16</td>
+                    <td class="">Main</td>
+                    <td class="">Sunrm Htd</td>
+                    <td class="">10</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">16</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">12</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">14</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">12</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">12</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">24</td>
+                    <td class="">16</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">10</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">LOOKING FOR A DEAL? WELL HERE YOU GO!!! 4 BEDROOM 2 AND A HALF BATH BRICK/CEDAR RANCH HOME ON ALMOST A HALF ACRE LOT IN A CUL-DE-SAC!!!! THIS HOME HAS HARDWOOD FLOORS, HUGE GREAT ROOM AND KITCHEN. THE HOME IS LOCATED NEAR SHOPPING, I-20,RIVER WATCH PARKWAY AND JUST MINUTES FROM THE MEDICAL DISTRICT.  THIS HOME WILL NOT LAST LONG AND IS PRICED TO SALE!!! THE HOME WILL BE SOLD IN AS/IS CONDITION WITH NO DISCLOSURES.</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R481786A
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="481841">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 481841" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="481841">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R481841A
+                                (Active)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $190,000
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>3718 Pine Ridge Run Martinez, GA 30907</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_481841" data-mlsno="481841" data-imagesource="https://images.navicamls.net/413/photos/1/481841_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/1/481841_0$.jpg" data-taxid="" data-latitude="33.5233834" data-longitude="-82.0869335" data-price="190000" data-format="1" data-address="3718  Pine Ridge Run   Martinez , GA  30907" data-dom="" data-officeid="390" data-agentid="12" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="12" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="1" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Columbia (2CO)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">COLUMBIA</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">PETERSBURG STATION</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">South Columbia</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Lakeside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Lakeside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">7</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">3</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">1377</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1980</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R481841A" title="R481841A" data-image-url="https://images.navicamls.net/413/photos/1/481841_0.jpg" src="./example_lead_report_files/481841_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Cable Ready, Eat In Kitchen, Foyer, Pantry, Smoke Detector, Recently Painted, Walk-in Closet, Washer/Dryer Connection, Blinds</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Dishwasher, Disposal, Refrigerator, Range-Electric, Hot Water-Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">Sunroom Unheated</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Stone, Living Room</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Forced Air</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Natural Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Ceiling Fan(s), Central</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Fenced Yard, Landscaped-Full, Storm Doors, Storm Windows/Doors</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Garage Double Attached</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">Cul-de-Sac</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Pool, Tennis, Clubhouse, Street Lights</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">16</td>
+                    <td class="">18</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">15</td>
+                    <td class="">14</td>
+                    <td class="">Main</td>
+                    <td class="">Sunrm Unht</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">15</td>
+                    <td class="">15</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">12</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">12</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">Love every day in this upgraded ranch home nestled on a quiet cul-d-sac in Petersburg Station neighborhood-Columbia County.  The spacious living room with dining space features a stone surround fireplace with seating and makes a perfect choice for group gatherings or unwinding.  Use the year round sunroom located off the living room and have easy access to the large, fenced rear yard that is buffered by church parking and treed space for extra privacy. And, the owner's suite has ample room for easy placement of furnishings, and the ensuite includes walk in closet space and a private three piece bath/toilet/vanity.  The house was freshly painted and new carpet added in 2021 throughout. In 2017-New heating and air conditioner with bi-annual services every year.  Rocking chair front porch, Double garage and fenced rear yard. Petersburg Racquetball and Tennis and pool have memberships available.  Move in ready.  Home available for move in by June 15, 2022</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R481841A
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="481991">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 481991" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="481991">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R481991P
+                                (Pending)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $250,000
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>543 Oak Brook Drive Martinez, GA 30907</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_481991" data-mlsno="481991" data-imagesource="https://images.navicamls.net/413/photos/1/481991_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/1/481991_0$.jpg" data-taxid="" data-latitude="33.5400931" data-longitude="-82.0890974" data-price="250000" data-format="1" data-address="543  Oak Brook Drive   Martinez , GA  30907" data-dom="" data-officeid="35" data-agentid="341" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="17" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="0" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Columbia (2CO)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">COLUMBIA</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">OAK BROOK</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">Blue Ridge</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Lakeside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Lakeside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">8</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">3</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1">Yes</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">1984</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1994</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R481991P" title="R481991P" data-image-url="https://images.navicamls.net/413/photos/1/481991_0.jpg" src="./example_lead_report_files/481991_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Cable Available, Eat In Kitchen, Foyer, Wired For Security System, Walk-in Closet, Washer/Dryer Connection, Blinds</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Dishwasher, Range-Electric</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">Foyer, Owner Bath, Laundry Room</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Gas Logs, Living Room</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Forced Air</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Natural Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Ceiling Fan(s), Central</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Community</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Landscaped-Partial, Fence-Privacy</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Garage Double Attached</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Street Lights</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">17</td>
+                    <td class="">16</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">13</td>
+                    <td class="">15</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bath</td>
+                    <td class="">7</td>
+                    <td class="">9</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">13</td>
+                    <td class="">5</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">12</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">Lndry Rm</td>
+                    <td class="">6</td>
+                    <td class="">8</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">13</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">12</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">Foyer</td>
+                    <td class="">10</td>
+                    <td class="">6</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">11</td>
+                    <td class="">7</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">Oak Brook subdivision is where this cozy ranch sits. Matured landscaping and spacious driveway welcomes you into an large foyer. A hallway leads you to the bedrooms that receive and abundance of natural light filtering in the front. The master suite sits in the rear of the home and features space for a sitting area. an office or a nursery. The master bath is large and holds a walk in closet along with separate tub and shower. Kitchen area leads to an eat in area, the laundry room and an attached double garage. Entertaining is easy with the vaulted ceiling, gas log fireplace, open to the dining area and flows right out onto the oversized wood deck that overlooks the privacy fenced rear yard. The lot behind the home is wooded giving extra privacy to relax, grill or gather. Newer HVAC and water heater. Convenient to Riverwatch, Evans, I-20, Augusta, Ft Gordon, shopping and schools. Home is priced for AS-IS condition. Don't let that deter you from calling for a tour!  </span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R481991P
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="475693">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 475693" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="475693">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R475693P
+                                (Pending)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $64,900
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>2101 Bayvale Road Augusta, GA 30909</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_475693" data-mlsno="475693" data-imagesource="https://images.navicamls.net/413/photos/3/475693_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/3/475693_0$.jpg" data-taxid="" data-latitude="33.458578" data-longitude="-82.0601108" data-price="64900" data-format="1" data-address="2101  Bayvale Road   Augusta , GA  30909" data-dom="" data-officeid="124" data-agentid="1" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="11" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="0" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Richmond (2RI)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">RICHMOND</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">BAYVALE PARK</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">Bayvale</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Murphy</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Josey T W  Comp.</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">6</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">3</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">1289</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1944</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R475693P" title="R475693P" data-image-url="https://images.navicamls.net/413/photos/3/475693_0.jpg" src="./example_lead_report_files/475693_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Smoke Detector, Washer/Dryer Connection</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Dishwasher, Range-Electric</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Living Room</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Forced Air</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Natural Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Central</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Other-See Remarks</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">12</td>
+                    <td class="">18</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">12</td>
+                    <td class="">15</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">12</td>
+                    <td class="">14</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">12</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">11</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">12</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">PRICE REDUCED!! Brick ranch located on a.92 acre lot. Living room with fireplace, spacious rooms, large indoor storage area, occupied by long term tenant. Some repairs needed.</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R475693P
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="478216">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 478216" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="478216">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R478216A
+                                (Active)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $97,500
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>2121 Lake Avenue Augusta, GA 30904</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_478216" data-mlsno="478216" data-imagesource="https://images.navicamls.net/413/photos/6/478216_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/6/478216_0$.jpg" data-taxid="" data-latitude="33.4919718" data-longitude="-82.0030588" data-price="97500" data-format="1" data-address="2121  Lake Avenue   Augusta , GA  30904" data-dom="" data-officeid="35" data-agentid="77" data-virtualtoururl="http://joebailey.photography/2121-Lake-Ave/idx" data-virtualtour2url="none" data-countofadditionalphotos="16" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="2" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Richmond (2RI)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">RICHMOND</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">NONE-2RI</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">Garrett</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Tutt</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Westside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">6</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1">Yes</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">1364</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1946</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R478216A" title="R478216A" data-image-url="https://images.navicamls.net/413/photos/6/478216_0.jpg" src="./example_lead_report_files/478216_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Eat In Kitchen, Washer/Dryer Connection, Blinds</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Dishwasher, Refrigerator, Wall Oven, Vent Hood</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">Foyer, Laundry Room</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Living Room</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Forced Air</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Electric, Natural Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Ceiling Fan(s), Central</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Landscaped-Partial</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Parking Pad</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Other-See Remarks</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">16</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">12</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">Lndry Rm</td>
+                    <td class="">9</td>
+                    <td class="">7</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">14</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">11</td>
+                    <td class="">11</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">25</td>
+                    <td class="">13</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">Look at this home on Lake Avenue! This 2 bedroom/1 bathroom home features a spacious unfinished great room that is ready to be finished and made your own! The living room features a fireplace and leads to the open kitchen featuring stainless steel appliances, wall oven, ample cabinet space, and more! Each bedroom features hardwood floors, a ceiling fan, and closet! This home has a lot of potential and located near numerous hospitals, shopping, restaurants, and much more! This home is great for an investor or a family looking for a project like the great room! Make sure you schedule your personal tour and see this home today!  </span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R478216A
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="480766">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 480766" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="480766">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R480766A
+                                (Active)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $35,000
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>1461 Chestnut Street Augusta, GA 30901</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_480766" data-mlsno="480766" data-imagesource="https://images.navicamls.net/413/photos/6/480766_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/6/480766_0$.jpg" data-taxid="" data-latitude="33.460181" data-longitude="-81.984148" data-price="35000" data-format="1" data-address="1461  Chestnut Street   Augusta , GA  30901" data-dom="" data-officeid="699" data-agentid="539" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="3" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="0" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Richmond (2RI)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">RICHMOND</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">NONE-NON</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">Collins</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Hornsby WS</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Lucy Laney</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">6</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">3</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1">Yes</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">1563</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1901</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R480766A" title="R480766A" data-image-url="https://images.navicamls.net/413/photos/6/480766_0.jpg" src="./example_lead_report_files/480766_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Ornamental, Living Room</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Fenced Yard, Sidewalk</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Parking Pad</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Sidewalks</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">10</td>
+                    <td class="">15</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">10</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">10</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">10</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">10</td>
+                    <td class="">12</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">10</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">Main</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">Cash Only, Investor Special. Large corner lot right across from other revitalization projects. The yard is fenced with access to the side road. Access road directly behind.  THIS IS CASH ONLY TRANSACTION. HOUSE IS SOLD AS IS AND WHERE IS . ELECTRIC AND WATER ARE TURNED OFF.</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R480766A
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="481627">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 481627" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="481627">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R481627A
+                                (Active)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $55,000
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>518 2nd Avenue Augusta, GA 30904</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_481627" data-mlsno="481627" data-imagesource="https://images.navicamls.net/413/photos/7/481627_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/7/481627_0$.jpg" data-taxid="" data-latitude="33.48505" data-longitude="-82.025721" data-price="55000" data-format="1" data-address="518  2nd Avenue   Augusta , GA  30904" data-dom="" data-officeid="359" data-agentid="595" data-virtualtoururl="http://app.cloudpano.com/tours/x_S4zqF5L?mls=1" data-virtualtour2url="none" data-countofadditionalphotos="12" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="2" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Richmond (1RI)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">RICHMOND</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">NONE-1RI</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">A Brian Merry</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Tutt</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Westside</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">4</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1">Yes</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">848</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1951</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R481627A" title="R481627A" data-image-url="https://images.navicamls.net/413/photos/7/481627_0.jpg" src="./example_lead_report_files/481627_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">Laundry Room</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">None</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Electric, Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Central, Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Other-See Remarks</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">15</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">12</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">Lndry Rm</td>
+                    <td class="">14</td>
+                    <td class="">8</td>
+                    <td class="">Main</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">15</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">12</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">Great investment opportunity.  Value add property to reposition and increase equity.  Brick ranch with 2 bedrooms and 1 bath with large laundry room.  Nice layout with hardwood flooring.</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R481627A
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="481850">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 481850" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="481850">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R481850A
+                                (Active)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $85,000
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>2009 1st Avenue Augusta, GA 30901</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_481850" data-mlsno="481850" data-imagesource="https://images.navicamls.net/413/photos/0/481850_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/0/481850_0$.jpg" data-taxid="" data-latitude="33.443846" data-longitude="-81.999986" data-price="85000" data-format="1" data-address="2009  1st Avenue   Augusta , GA  30901" data-dom="" data-officeid="202" data-agentid="1070" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="0" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="1" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Richmond (2RI)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">RICHMOND</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">NELLIEVILLE</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">WILKENSON-GARDEN</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Murphy</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Josey T W  Comp.</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">5</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">3</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">1451</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1979</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R481850A" title="R481850A" data-image-url="https://images.navicamls.net/413/photos/0/481850_0.jpg" src="./example_lead_report_files/481850_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Smoke Detector, Washer/Dryer Connection</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Microwave, Range-Electric</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">Owner Bath, Laundry Room</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">None</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Forced Air</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Electric, Natural Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Ceiling Fan(s), Central</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">Fenced Yard</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Carport Single Detached</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Street Lights</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">14</td>
+                    <td class="">14</td>
+                    <td class="">Main</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">14</td>
+                    <td class="">10</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">10</td>
+                    <td class="">9</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">9</td>
+                    <td class="">9</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">10</td>
+                    <td class="">13</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">10</td>
+                    <td class="">9</td>
+                    <td class="">Main</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">18</td>
+                    <td class="">9</td>
+                    <td class="">Main</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">This 3-bedroom charmer is created by a functional interior and provides a formal dining room, well-proportioned rooms, one and a half bathrooms, and a recently added bonus room. It features a covered patio, well-established trees, and space for storage. It is located in an established neighborhood, with easy around-town travel; thanks to freeways and many public transportation options nearby. See for yourself what this home has to offer. </span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R481850A
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>                        <script>
+                            var resultDisplayId = '5';
+                            var resultDisplay = '14';
+                        </script>
+
+
+
+<style>
+    .mainPhoto img {max-height:450px;}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div id="expandedWrapper" class="expandedListingWrapper">
+            <!-- Layout 5 -->
+            <div class="expListingInfo">
+                <div class="expListingToolsBkgd rounded-top">
+                    <a id="addPhotos" class="resultsListingToolbarIcons jsEmailDisplayAddPhotos font-white" data-mlsno="481941">
+                        <img src="./example_lead_report_files/addPhotos.png" class="img-fluid" alt="Additional Photo Link for 481941" title="Additional Photo">
+                        Additional Photos
+                    </a>
+                                                        </div>
+                <div class="font-weight-bold row">
+                    <div class="col-12" data-mlsno="481941">
+
+                        
+                            <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                MLS #: R481941P
+                                (Pending)
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline">
+                                List Price: $79,990
+                            </div>
+                                                    <div class="pr-1 pl-1 d-xs-block d-md-inline float-md-right">
+                                <span>1549 Heath Street Augusta, GA 30904</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandedLayoutContentWrapper border rounded-top">
+
+
+                <input type="hidden" class="selectedMlsNo" id="listingData_481941" data-mlsno="481941" data-imagesource="https://images.navicamls.net/413/photos/1/481941_0.jpg" data-thumbimagesource="https://images.navicamls.net/413/photos/1/481941_0$.jpg" data-taxid="" data-latitude="33.464951" data-longitude="-82.022749" data-price="79990" data-format="1" data-address="1549  Heath Street   Augusta , GA  30904" data-dom="" data-officeid="359" data-agentid="654" data-virtualtoururl="none" data-virtualtour2url="none" data-countofadditionalphotos="22" data-hasopenhouse="False" data-allowshowings="True" data-countofdocuments="1" data-instaneturl="" data-agentinboxurl="" data-showingtimeurl="">
+
+                <div class="expandedListingTools">
+                </div>
+
+                <!-- beginning of datapanels -->
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Bldg/Unit #" class="pl-1">Bldg/Unit #:</label>
+                <span id="Bldg/Unit #" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Area/Zone" class="pl-1">Area/Zone:</label>
+                <span id="Area/Zone" class="pl-1">Richmond (1RI)</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="County" class="pl-1">County:</label>
+                <span id="County" class="pl-1">RICHMOND</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Subdivision" class="pl-1">Subdivision:</label>
+                <span id="Subdivision" class="pl-1">MONTE SANO</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Condo Name" class="pl-1">Condo Name:</label>
+                <span id="Condo Name" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Elementary School" class="pl-1">Elementary School:</label>
+                <span id="Elementary School" class="pl-1">Monte Sano</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Middle School" class="pl-1">Middle School:</label>
+                <span id="Middle School" class="pl-1">Langford</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="High School" class="pl-1">High School:</label>
+                <span id="High School" class="pl-1">Richmond Academy</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Style" class="pl-1">Style:</label>
+                <span id="Style" class="pl-1">Ranch</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Total # Rooms" class="pl-1">Total # Rooms:</label>
+                <span id="Total # Rooms" class="pl-1">4</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Bedrooms" class="pl-1">Bedrooms:</label>
+                <span id="Bedrooms" class="pl-1">2</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Full Baths" class="pl-1">Full Baths:</label>
+                <span id="Full Baths" class="pl-1">1</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Half Baths" class="pl-1">Half Baths:</label>
+                <span id="Half Baths" class="pl-1">0</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Owner Suite on Main" class="pl-1">Owner Suite on Main:</label>
+                <span id="Owner Suite on Main" class="pl-1"></span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Total Heated SqFt" class="pl-1">Apx Total Heated SqFt:</label>
+                <span id="Apx Total Heated SqFt" class="pl-1">788</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+            <label aria-label="Apx Year Built" class="pl-1">Apx Year Built:</label>
+                <span id="Apx Year Built" class="pl-1">1946</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+<div class="mainPhoto text-center">
+    <img class="img-thumbnail img-fluid" alt="Main listing image for R481941P" title="R481941P" data-image-url="https://images.navicamls.net/413/photos/1/481941_0.jpg" src="./example_lead_report_files/481941_0.jpg">
+</div>
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Features</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Interior Features" class="pl-1">Interior Features:</label>
+                <span id="Interior Features" class="pl-1">Built Ins, Drywall, Garden Tub</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Appliances" class="pl-1">Appliances:</label>
+                <span id="Appliances" class="pl-1">Other-See Remarks</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Extra Rooms" class="pl-1">Extra Rooms:</label>
+                <span id="Extra Rooms" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fireplace Details" class="pl-1">Fireplace Details:</label>
+                <span id="Fireplace Details" class="pl-1">Brick</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Heat Delivery" class="pl-1">Heat Delivery:</label>
+                <span id="Heat Delivery" class="pl-1">Stove/Fireplace, Wall Unit</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Fuel Source" class="pl-1">Fuel Source:</label>
+                <span id="Fuel Source" class="pl-1">Electric, Natural Gas</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="AC/Ventilation" class="pl-1">AC/Ventilation:</label>
+                <span id="AC/Ventilation" class="pl-1">Ceiling Fan(s), Window A/C</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Water" class="pl-1">Water:</label>
+                <span id="Water" class="pl-1">Public</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Sewer" class="pl-1">Sewer:</label>
+                <span id="Sewer" class="pl-1">Public Sewer</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Exterior Features" class="pl-1">Exterior Features:</label>
+                <span id="Exterior Features" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Garage/Carport" class="pl-1">Garage/Carport:</label>
+                <span id="Garage/Carport" class="pl-1">Parking Pad</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Lot Description" class="pl-1">Lot Description:</label>
+                <span id="Lot Description" class="pl-1">None</span>
+    </div>
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Neighborhood Amenities" class="pl-1">Neighborhood Amenities:</label>
+                <span id="Neighborhood Amenities" class="pl-1">Street Lights</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+<div class="table-responsive">
+    <table id="expanded-data-table" class="table table-condensed table-bordered">
+        <tbody><tr>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+                    <td class=""></td>
+                    <td class="">Length</td>
+                    <td class="">Width</td>
+                    <td class="">Lvl</td>
+</tr><tr>                    <td class="">Living Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Owner Bedroom</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Kitchen</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 2</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Dining Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 3</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">None</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+</tr><tr>                    <td class="">Family Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 4</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Great Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class="">Bedroom 5</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+</tr><tr>                    <td class="">Breakfast Rm</td>
+                    <td class="">0</td>
+                    <td class="">0</td>
+                    <td class="">-</td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+                    <td class=""></td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div></div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        
+
+
+
+
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+    <div class="titleRow">
+        <div class="pl-2 pb-1">
+            <h5 class="mb-0">Property Description</h5>
+        </div>
+    </div>
+
+
+
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        
+
+
+
+
+
+
+    <div class="exp-Row">
+
+                <label aria-label="Property Description" class="pl-1">Property Description:</label>
+                <span id="Property Description" class="pl-1">INVESTOR SPECIAL - This 2BR/1BA house is full of opportunity.  Centrally located to downtown and the medical district.  This house would make a great home for an owner-occupant or an income producing investment property.  The property just needs some work to get in shape.  Property is sold As-Is.  No seller's disclosure as seller has never occupied home. Sales agent is member of the ownership LLC.  Lockbox code in showing acceptance email.  Offers due by 6:30 on March 8!</span>
+    </div>
+ 
+                    </div>
+                    <div class="col-12"><div class="expandedDisplayRowEmail"></div></div>
+                </div>
+
+                
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="hideWhenEmpty"></div>
+
+                <div class="row">
+                    <div class="expFooter col-12">
+                        Information Herein Deemed Reliable but Not Guaranteed
+                        <span class="noprint font-white">5,0</span>
+                    </div>
+                    <div class="printFooter col-12">
+                        MLS #: R481941P
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="listingFooter"></div>            </div>
+
+            <div class="row">
+                <div id="stickyButtonWrapperBtm" class="col-xs-12 col-sm-12">
+                    <br>
+                    <div class="text-center">
+                        <a class="btn btn-default" href="https://next.navicamls.net/413/ListingDisplay/?eListingId=16652761&amp;eListingKey=6cnrMN#">Return to TOP</a>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <form id="mySortOrderForm" style="display:none;">
+<input id="mlsNos_0_" name="mlsNos[0]" type="hidden" value="475693"><input id="addresses_0_" name="addresses[0]" type="hidden" value="2101 Bayvale Road Augusta, GA 30909"><input id="formatNos_0_" name="formatNos[0]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_1_" name="mlsNos[1]" type="hidden" value="478216"><input id="addresses_1_" name="addresses[1]" type="hidden" value="2121 Lake Avenue Augusta, GA 30904"><input id="formatNos_1_" name="formatNos[1]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_2_" name="mlsNos[2]" type="hidden" value="480766"><input id="addresses_2_" name="addresses[2]" type="hidden" value="1461 Chestnut Street Augusta, GA 30901"><input id="formatNos_2_" name="formatNos[2]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_3_" name="mlsNos[3]" type="hidden" value="481627"><input id="addresses_3_" name="addresses[3]" type="hidden" value="518 2nd Avenue Augusta, GA 30904"><input id="formatNos_3_" name="formatNos[3]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_4_" name="mlsNos[4]" type="hidden" value="481786"><input id="addresses_4_" name="addresses[4]" type="hidden" value="451 Baker Woods Trail Martinez, GA 30907"><input id="formatNos_4_" name="formatNos[4]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_5_" name="mlsNos[5]" type="hidden" value="481841"><input id="addresses_5_" name="addresses[5]" type="hidden" value="3718 Pine Ridge Run Martinez, GA 30907"><input id="formatNos_5_" name="formatNos[5]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_6_" name="mlsNos[6]" type="hidden" value="481850"><input id="addresses_6_" name="addresses[6]" type="hidden" value="2009 1st Avenue Augusta, GA 30901"><input id="formatNos_6_" name="formatNos[6]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_7_" name="mlsNos[7]" type="hidden" value="481941"><input id="addresses_7_" name="addresses[7]" type="hidden" value="1549 Heath Street Augusta, GA 30904"><input id="formatNos_7_" name="formatNos[7]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0"><input id="mlsNos_8_" name="mlsNos[8]" type="hidden" value="481991"><input id="addresses_8_" name="addresses[8]" type="hidden" value="543 Oak Brook Drive Martinez, GA 30907"><input id="formatNos_8_" name="formatNos[8]" type="hidden" value="1"><input id="sourceAction" name="sourceAction" type="hidden" value="NotSet"><input id="originalSearchId" name="originalSearchId" type="hidden" value="0">    </form>
+
+    <div class="mySortOrderDialog" style="display:none;"></div>
+
+    <script>
+        //var dialogScreenReaderText = "Close Button";
+        
+        $('.jsStartALoop').on('click', function(){
+            $('#startALoopForm').submit();
+        });
+        $(document).ready(function () {
+            var dialogScreenReaderElement = "<span class='sr-only'>Close Button</span>"
+            $('.ui-dialog-titlebar-close').append(dialogScreenReaderElement);
+
+            if ($(".isOnlyOneMlsPerPage").val() == "true") {
+                if ($(".anyListingsContainTeamMembers").val() == "true") {
+                    $(".teamAgentButton").show();
+                    $(".teamAgentIndicator").val("true");
+                }
+                else {
+                    $(".teamAgentButton").hide();
+                    $(".teamAgentIndicator").val("false");
+                }
+            }
+            else {
+                if ($(".anyListingsContainTeamMembers").val() == "true") {
+                    $(".teamAgentButton").show();
+                    $(".teamAgentIndicator").val("true");
+                }
+                else {
+                    $(".teamAgentButton").hide();
+                    $(".teamAgentIndicator").val("false");
+                }
+            }
+        });
+
+        $(document).on("click", ".jsEmailDisplayAddPhotos", function (e) {
+            var mlsNo = $(this).attr('data-mlsno');
+            if (!mlsNo) {
+                mlsNo = $(this).parents('div.jsMlsNo').attr('data-mlsno');
+            }
+
+            newTab('/' + 413 + '/ListingDisplay/AdditionalPhotos?mlsNo=' + mlsNo, 'Additional Photos');
+
+            e.preventDefault();
+        });
+
+        $(document).on("click", ".jsEmailDisplayMap", function (e) {
+            var mlsNo = $(this).attr('data-mlsno');
+            if (!mlsNo) {
+                mlsNo = $(this).parents('div.jsMlsNo').attr('data-mlsno');
+            }
+
+            newTab('/' + 413 + '/ListingDisplay/MapListing?mlsNo=' + mlsNo, 'Map Listing');
+
+            e.preventDefault();
+        });
+
+        function newTab(str_url) {
+            thisWindow = window.open(str_url, '_blank');
+            if (thisWindow) {
+                thisWindow.focus();
+            }
+        }
+    </script>
+
+
+<div tabindex="-1" role="dialog" class="ui-dialog ui-corner-all ui-widget ui-widget-content ui-front ui-dialog-buttons ui-draggable" aria-describedby="dialog-mapDiv" aria-labelledby="ui-id-1" style="display: none;"><div class="ui-dialog-titlebar ui-corner-all ui-widget-header ui-helper-clearfix ui-draggable-handle"><span id="ui-id-1" class="ui-dialog-title">Map</span><button type="button" class="ui-dialog-titlebar-close"><span class="sr-only">Close Button</span></button></div><div id="dialog-mapDiv" class="isHiddenOnLoad jsMapPrint ui-dialog-content ui-widget-content">
+        <div id="mapDivDia" class="mapDivDialogWrapper" title="Map"></div>
+        <div id="divForPrint" style="position:relative;"></div>
+    </div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button">Close</button><button type="button">Print</button><button type="button">Full Page</button></div></div></div></body></html>
